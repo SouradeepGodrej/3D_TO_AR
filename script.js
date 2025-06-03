@@ -80,15 +80,18 @@ async function handleFileUpload(event) {
             // Generate unique model ID
             const modelId = generateModelId();
             
-            // Store model data with Cloudinary URL
-            const modelData = {
-                url: result.secure_url,
-                cloudinaryId: result.public_id,
-                filename: file.name,
-                uploadTime: new Date().toISOString(),
-                fileSize: formatFileSize(file.size),
-                originalSize: file.size
-            };
+            /// Store model data with Cloudinary URL
+const modelData = {
+    url: result.secure_url, // This is the correct URL
+    cloudinaryId: result.public_id,
+    filename: file.name,
+    uploadTime: new Date().toISOString(),
+    fileSize: formatFileSize(file.size),
+    originalSize: file.size,
+    // ADD THESE FIELDS:
+    cloudinaryVersion: result.version, // Store the version number
+    originalFilename: file.name.replace(/\.[^/.]+$/, "") // Store filename without extension
+};
             
             // Store reference in localStorage (just the metadata, not the file)
             try {
@@ -511,21 +514,25 @@ async function checkUrlParameters() {
         // If localStorage failed or URL is from different device, try alternative methods
         
         // Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
-        if (modelId.includes('model_')) {
+        // Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
+// Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
+// Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
+if (modelId.includes('model_')) {
     const timestamp = modelId.split('_')[1];
     if (timestamp && !isNaN(timestamp)) {
-        // Try to construct URL similar to the actual upload format
+        // FIXED: Use correct URL format matching your actual Cloudinary URLs
         const baseUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`;
         
-        // Test both with and without version number
+        // Test multiple URL variations to match Cloudinary's actual format
         const urlVariations = [
-            `${baseUrl}/3d_models/${timestamp}_model`,
-            `${baseUrl}/v${timestamp}/3d_models/${timestamp}_model`
-        ];
+    `${baseUrl}/3d_models/${timestamp}_${modelData.originalFilename || 'model'}`,
+    `${baseUrl}/v${result.version || timestamp}/3d_models/${timestamp}_${modelData.originalFilename || 'model'}`
+];
         
         for (const baseTestUrl of urlVariations) {
             for (const ext of ['.glb', '.gltf']) {
                 const testUrl = baseTestUrl + ext;
+                console.log('Testing URL:', testUrl);
                 const urlTest = await testModelUrl(testUrl);
                 
                 if (urlTest.success) {
