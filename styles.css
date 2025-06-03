@@ -678,35 +678,6 @@ model-viewer {
     background-color: var(--godrej-primary);
 }
 
-.mini-loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-.gallery-model-viewer[loaded] + .mini-loading-overlay {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.mini-loader {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--gray-200);
-    border-top: 2px solid var(--godrej-primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
 /* Mobile Responsive Design */
 @media (max-width: 1024px) {
     .main-content {
