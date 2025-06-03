@@ -18,6 +18,7 @@ function initializeApp() {
     checkUrlParameters();
     setupARSupport();
     preventDoubleTapZoom();
+    updateGallery();
 }
 
 // Event Listeners Setup
@@ -113,6 +114,7 @@ const modelData = {
             loadModel(result.secure_url, file.name, modelId);
             
             showNotification(`${file.name} uploaded successfully! (${formatFileSize(file.size)})`);
+            updateGallery();
         } else {
             throw new Error('No secure URL returned from Cloudinary');
         }
@@ -184,6 +186,7 @@ function onModelLoad(event) {
     
     // Log model statistics
     logModelStats(modelViewer);
+    updateGallery();
 }
 
 // Check Texture Loading Status
@@ -693,6 +696,169 @@ function cleanup() {
         }
     });
     models.clear();
+}
+
+// Gallery Management Functions
+function updateGallery() {
+    const galleryGrid = document.getElementById('galleryGrid');
+    
+    // Get all models from localStorage and current session
+    const allModels = new Map();
+    
+    // Add models from localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('model_')) {
+            try {
+                const modelData = JSON.parse(localStorage.getItem(key));
+                const modelId = key.replace('model_', '');
+                allModels.set(modelId, modelData);
+            } catch (error) {
+                console.warn('Invalid model data in localStorage:', key);
+            }
+        }
+    }
+    
+    // Add current session models
+    models.forEach((modelData, modelId) => {
+        allModels.set(modelId, modelData);
+    });
+    
+    if (allModels.size === 0) {
+        galleryGrid.innerHTML = `
+            <div class="gallery-placeholder">
+                <div class="placeholder-icon">📁</div>
+                <p>No models uploaded yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    galleryGrid.innerHTML = '';
+    
+    // Sort models by upload time (newest first)
+    const sortedModels = Array.from(allModels.entries()).sort((a, b) => {
+        const timeA = new Date(a[1].uploadTime || 0);
+        const timeB = new Date(b[1].uploadTime || 0);
+        return timeB - timeA;
+    });
+    
+    sortedModels.forEach(([modelId, modelData]) => {
+        const galleryItem = createGalleryItem(modelId, modelData);
+        galleryGrid.appendChild(galleryItem);
+    });
+}
+function createGalleryItem(modelId, modelData) {
+    const item = document.createElement('div');
+    item.className = 'gallery-item';
+    item.dataset.modelId = modelId;
+    
+    const uploadDate = new Date(modelData.uploadTime || Date.now()).toLocaleDateString();
+    const isCurrentModel = currentModelUrl === modelData.url;
+    
+    item.innerHTML = `
+        <div class="gallery-item-header">
+            <div class="gallery-item-info">
+                <h4>${modelData.filename || 'Unknown Model'}</h4>
+                <div class="file-meta">${modelData.fileSize || 'Unknown size'} • ${uploadDate}</div>
+            </div>
+        </div>
+        <div class="gallery-item-preview">🎲</div>
+        <div class="gallery-item-actions">
+            <button class="gallery-btn load-btn" onclick="loadModelFromGallery('${modelId}')" 
+                    ${isCurrentModel ? 'disabled' : ''}>
+                ${isCurrentModel ? '✓ Loaded' : '📂 Load'}
+            </button>
+            <button class="gallery-btn delete-btn" onclick="deleteModelFromGallery('${modelId}')">
+                🗑️ Delete
+            </button>
+        </div>
+    `;
+    
+    return item;
+}
+async function loadModelFromGallery(modelId) {
+    const modelData = models.get(modelId) || JSON.parse(localStorage.getItem(`model_${modelId}`));
+    
+    if (!modelData) {
+        showNotification('Model not found', 'error');
+        return;
+    }
+    
+    showLoading(true);
+    
+    try {
+        // Test if URL is still accessible
+        const urlTest = await testModelUrl(modelData.url);
+        
+        if (urlTest.success) {
+            currentModelUrl = modelData.url;
+            loadModel(modelData.url, modelData.filename, modelId);
+            showNotification(`Loading ${modelData.filename}...`);
+            updateGallery(); // Refresh gallery to show current model state
+        } else {
+            showNotification('Model file no longer accessible', 'error');
+            showLoading(false);
+        }
+    } catch (error) {
+        console.error('Error loading model from gallery:', error);
+        showNotification('Failed to load model', 'error');
+        showLoading(false);
+    }
+}
+async function deleteModelFromGallery(modelId) {
+    if (!confirm('Are you sure you want to delete this model? This action cannot be undone.')) {
+        return;
+    }
+    
+    const modelData = models.get(modelId) || JSON.parse(localStorage.getItem(`model_${modelId}`));
+    
+    if (!modelData) {
+        showNotification('Model not found', 'error');
+        return;
+    }
+    
+    try {
+        // If model has Cloudinary ID, delete from Cloudinary
+        if (modelData.cloudinaryId) {
+            // Note: Direct deletion from client requires signed requests
+            // For now, we'll just remove local references
+            console.log('Model should be deleted from Cloudinary:', modelData.cloudinaryId);
+            // TODO: Implement server-side deletion endpoint
+        }
+        
+        // Remove from localStorage
+        localStorage.removeItem(`model_${modelId}`);
+        
+        // Remove from current session
+        models.delete(modelId);
+        
+        // If this was the current model, clear viewer
+        if (currentModelUrl === modelData.url) {
+            const modelViewer = document.getElementById('modelViewer');
+            modelViewer.src = '';
+            currentModelUrl = null;
+            enableAR(false);
+            showModelInfo(false);
+            
+            // Clear QR code
+            const qrContainer = document.getElementById('qrContainer');
+            qrContainer.innerHTML = `
+                <div class="qr-placeholder">
+                    <div class="placeholder-icon">📱</div>
+                    <p>Upload a model to generate QR code</p>
+                </div>
+            `;
+            document.getElementById('shareUrl').value = '';
+        }
+        
+        updateGallery();
+        showNotification(`${modelData.filename} deleted successfully`);
+        
+    } catch (error) {
+        console.error('Error deleting model:', error);
+        showNotification('Error deleting model', 'error');
+    }
 }
 
 // Page Unload Cleanup
