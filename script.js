@@ -514,25 +514,26 @@ async function checkUrlParameters() {
         // If localStorage failed or URL is from different device, try alternative methods
         
         // Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
-        // Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
-// Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
-// Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
+
 if (modelId.includes('model_')) {
     const timestamp = modelId.split('_')[1];
     if (timestamp && !isNaN(timestamp)) {
-        // FIXED: Use correct URL format matching your actual Cloudinary URLs
         const baseUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`;
         
-        // Test multiple URL variations to match Cloudinary's actual format
+        // Try different URL patterns based on how Cloudinary actually stores files
         const urlVariations = [
-    `${baseUrl}/3d_models/${timestamp}_${modelData.originalFilename || 'model'}`,
-    `${baseUrl}/v${result.version || timestamp}/3d_models/${timestamp}_${modelData.originalFilename || 'model'}`
-];
-        
+            // Pattern 1: Simple timestamp-based
+            `${baseUrl}/3d_models/${timestamp}_model`,
+            // Pattern 2: With version
+            `${baseUrl}/v${timestamp}/3d_models/${timestamp}_model`,
+            // Pattern 3: Try without specific naming (let Cloudinary handle it)
+            `${baseUrl}/3d_models/${timestamp}_spongebob`, // Replace 'spongebob' with generic terms
+        ];
+
         for (const baseTestUrl of urlVariations) {
             for (const ext of ['.glb', '.gltf']) {
                 const testUrl = baseTestUrl + ext;
-                console.log('Testing URL:', testUrl);
+                console.log('Testing URL:', testUrl); // Keep this for debugging
                 const urlTest = await testModelUrl(testUrl);
                 
                 if (urlTest.success) {
