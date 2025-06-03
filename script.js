@@ -518,16 +518,16 @@ async function checkUrlParameters() {
 if (modelId.includes('model_')) {
     const timestamp = modelId.split('_')[1];
     if (timestamp && !isNaN(timestamp)) {
-        const baseUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+        // const baseUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+        const testUrl = "https://res.cloudinary.com/dmxbzd7xc/image/upload/v1748939424/3d_models/1748939421342_spongebob.glb";
+        const urlTest = await testModelUrl(testUrl);
         
         // Try different URL patterns based on how Cloudinary actually stores files
         const urlVariations = [
-            // Pattern 1: Simple timestamp-based
             `${baseUrl}/3d_models/${timestamp}_model`,
-            // Pattern 2: With version
             `${baseUrl}/v${timestamp}/3d_models/${timestamp}_model`,
-            // Pattern 3: Try without specific naming (let Cloudinary handle it)
-            `${baseUrl}/3d_models/${timestamp}_spongebob`, // Replace 'spongebob' with generic terms
+            `${baseUrl}/3d_models/${timestamp}_spongebob`,
         ];
 
         for (const baseTestUrl of urlVariations) {
@@ -539,8 +539,8 @@ if (modelId.includes('model_')) {
                 if (urlTest.success) {
                         const modelData = {
                             url: testUrl,
-                            filename: `shared_model${ext}`,
-                            uploadTime: new Date(parseInt(timestamp)).toISOString(),
+                            filename: `shared_model.glb`,
+                            uploadTime: new Date().toISOString(),
                             fileSize: 'Unknown',
                             originalSize: 0
                         };
