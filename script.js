@@ -2,7 +2,7 @@
 let currentModelUrl = null;
 let models = new Map(); // Store uploaded models
 
-const CLOUDINARY_CLOUD_NAME = 'dwocdg3m9'; // Replace with your Cloudinary cloud name
+const CLOUDINARY_CLOUD_NAME = 'dmxbzd7xc'; // Replace with your Cloudinary cloud name
 const CLOUDINARY_UPLOAD_PRESET = '3D_TO_AR'; // Replace with your upload preset name
 const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
 
