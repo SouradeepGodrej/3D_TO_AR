@@ -747,6 +747,25 @@ function updateGallery() {
         const galleryItem = createGalleryItem(modelId, modelData);
         galleryGrid.appendChild(galleryItem);
     });
+
+    // Add this after creating gallery items
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const modelViewer = entry.target.querySelector('.gallery-model-viewer');
+            if (modelViewer && !modelViewer.src) {
+                const modelId = entry.target.dataset.modelId;
+                const modelData = models.get(modelId) || JSON.parse(localStorage.getItem(`model_${modelId}`));
+                modelViewer.src = modelData.url;
+            }
+        }
+    });
+});
+
+// Observe all gallery items
+galleryGrid.querySelectorAll('.gallery-item').forEach(item => {
+    observer.observe(item);
+});
 }
 function createGalleryItem(modelId, modelData) {
     const item = document.createElement('div');
@@ -763,7 +782,28 @@ function createGalleryItem(modelId, modelData) {
                 <div class="file-meta">${modelData.fileSize || 'Unknown size'} • ${uploadDate}</div>
             </div>
         </div>
-        <div class="gallery-item-preview">🎲</div>
+        <div class="gallery-item-preview">
+        <div class="mini-loading-overlay">
+        <div class="mini-loader"></div>
+        </div>
+    <model-viewer
+        class="gallery-model-viewer"
+        src="${modelData.url}"
+        camera-controls
+        disable-zoom
+        disable-pan
+        auto-rotate
+        auto-rotate-delay="2000"
+        rotation-per-second="30deg"
+        camera-orbit="45deg 55deg 2m"
+        environment-image="neutral"
+        exposure="0.8"
+        shadow-intensity="0.5"
+        loading="lazy"
+        reveal="interaction"
+        style="--poster-color: #f3f4f6;">
+    </model-viewer>
+</div>
         <div class="gallery-item-actions">
             <button class="gallery-btn load-btn" onclick="loadModelFromGallery('${modelId}')" 
                     ${isCurrentModel ? 'disabled' : ''}>
