@@ -3,84 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D AR Model Viewer</title>
+    <title>3D AR Model Viewer - Godrej Properties</title>
     
     <!-- External Libraries -->
-    <!-- <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script> -->
     <script type="module" src="https://unpkg.com/@google/model-viewer@^3.0.0/dist/model-viewer.min.js"></script>
     
     <!-- Local Stylesheets -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Google Fonts for professional typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="main-viewer">
-            <div class="loading-overlay" id="loadingOverlay">
-                <div class="loader"></div>
-            </div>
-            
-            <model-viewer
-                id="modelViewer"
-                camera-controls
-                touch-action="pan-y"
-                auto-rotate
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                environment-image="neutral"
-                exposure="1"
-                shadow-intensity="1"
-                shadow-softness="0.5"
-                camera-orbit="45deg 55deg 4m"
-                min-camera-orbit="auto auto 2m"
-                max-camera-orbit="auto auto 10m"
-                tone-mapping="aces"
-                loading="eager"
-                reveal="auto"
-                style="--poster-color: transparent;">
-                
-                <div class="progress-bar" id="progress-bar" slot="progress-bar">
-                    <div class="update-bar"></div>
+        <!-- Header with Logos -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo-group">
+                    <img src="godrej-properties-logo.png" alt="Godrej Properties" class="main-logo">
+                    <div class="brand-text">
+                        <h1>3D AR Model Viewer</h1>
+                        <p>Powered by Godrej Properties Technology</p>
+                    </div>
                 </div>
-            </model-viewer>
-            
-            <div class="model-info" id="modelInfo">
-                <strong>Model Controls:</strong><br>
-                • Drag to rotate • Scroll to zoom • Two fingers to pan
-            </div>
-        </div>
-
-        <div class="control-panel">
-            <h2 class="panel-title">3D AR Viewer</h2>
-            
-            <!-- Upload Section -->
-            <div class="upload-section">
-                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                    📁 Upload 3D Model
-                </button>
-                <input type="file" id="fileInput" class="file-input" accept=".glb,.gltf" />
-                <div class="file-info">Supports .GLB and .GLTF files</div>
-            </div>
-
-            <!-- QR Code Section -->
-            <div class="qr-section">
-                <div class="qr-title">🔗 Share QR Code</div>
-                <div class="qr-container" id="qrContainer">
-                    <div class="qr-placeholder">Upload a model to generate QR code</div>
+                <div class="partner-logos">
+                    <img src="gpl-tech-logo.png" alt="GPL Tech" class="tech-logo">
+                    <img src="design-studio-logo.png" alt="Design Studio" class="studio-logo">
                 </div>
-                <input type="text" class="share-url" id="shareUrl" placeholder="Share URL will appear here" readonly />
-                <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">📋 Copy Link</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="viewer-section">
+                <div class="viewer-container">
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="loader"></div>
+                        <p class="loader-text">Loading your 3D model...</p>
+                    </div>
+                    
+                    <model-viewer
+                        id="modelViewer"
+                        camera-controls
+                        touch-action="pan-y"
+                        auto-rotate
+                        ar
+                        ar-modes="webxr scene-viewer quick-look"
+                        environment-image="neutral"
+                        exposure="1"
+                        shadow-intensity="1"
+                        shadow-softness="0.5"
+                        camera-orbit="45deg 55deg 4m"
+                        min-camera-orbit="auto auto 2m"
+                        max-camera-orbit="auto auto 10m"
+                        tone-mapping="aces"
+                        loading="eager"
+                        reveal="auto"
+                        style="--poster-color: #f8f9fa;">
+                        
+                        <div class="progress-bar" id="progress-bar" slot="progress-bar">
+                            <div class="update-bar"></div>
+                        </div>
+                    </model-viewer>
+                    
+                    <div class="model-info" id="modelInfo">
+                        <div class="info-content">
+                            <h3>Model Controls</h3>
+                            <div class="controls-list">
+                                <span class="control-item">🖱️ Drag to rotate</span>
+                                <span class="control-item">🔍 Scroll to zoom</span>
+                                <span class="control-item">✋ Two fingers to pan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- AR Section -->
-            <div class="ar-section">
-                <button class="ar-btn" id="arBtn" onclick="openAR()">
-                    🥽 View in AR
-                </button>
+            <div class="control-section">
+                <!-- Upload Panel -->
+                <div class="control-panel upload-panel">
+                    <div class="panel-header">
+                        <h2>📁 Upload Model</h2>
+                        <p>Import your 3D models for AR viewing</p>
+                    </div>
+                    
+                    <div class="upload-area">
+                        <button class="upload-btn primary-btn" onclick="document.getElementById('fileInput').click()">
+                            <span class="btn-icon">📁</span>
+                            <span class="btn-text">Choose 3D Model</span>
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" accept=".glb,.gltf" />
+                        <div class="file-info">
+                            <p class="supported-formats">Supports GLB & GLTF formats</p>
+                            <p class="size-limit">Max file size: 100MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share Panel -->
+                <div class="control-panel share-panel">
+                    <div class="panel-header">
+                        <h2>🔗 Share & Connect</h2>
+                        <p>Generate QR code to share your model</p>
+                    </div>
+                    
+                    <div class="qr-section">
+                        <div class="qr-container" id="qrContainer">
+                            <div class="qr-placeholder">
+                                <div class="placeholder-icon">📱</div>
+                                <p>Upload a model to generate QR code</p>
+                            </div>
+                        </div>
+                        
+                        <div class="share-controls">
+                            <input type="text" class="share-url" id="shareUrl" placeholder="Share URL will appear here" readonly />
+                            <button class="copy-btn secondary-btn" id="copyBtn" onclick="copyToClipboard()">
+                                <span class="btn-icon">📋</span>
+                                <span class="btn-text">Copy Link</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AR Panel -->
+                <div class="control-panel ar-panel">
+                    <div class="panel-header">
+                        <h2>🥽 Augmented Reality</h2>
+                        <p>Experience your model in AR</p>
+                    </div>
+                    
+                    <div class="ar-section">
+                        <button class="ar-btn primary-btn disabled" id="arBtn" onclick="openAR()">
+                            <span class="btn-icon">🥽</span>
+                            <span class="btn-text">Launch AR Experience</span>
+                        </button>
+                        
+                        <div class="ar-info">
+                            <p class="ar-requirements">
+                                <strong>AR Requirements:</strong><br>
+                                • iOS 12+ or Android 7+<br>
+                                • ARCore/ARKit support<br>
+                                • Secure connection (HTTPS)
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
+    <!-- Notification System -->
+    <div class="notification" id="notification">
+        <div class="notification-content">
+            <span class="notification-icon">✅</span>
+            <span class="notification-text">Notification message</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Godrej Properties. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+        </div>
+    </footer>
 
     <!-- Local JavaScript -->
     <script src="script.js"></script>
