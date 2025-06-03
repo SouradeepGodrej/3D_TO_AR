@@ -697,81 +697,166 @@ model-viewer {
     }
 }
 
-@media (max-width: 768px) {
-    .header {
-        padding: var(--space-md);
-    }
-    
-    .logo-section {
-        flex-direction: column;
-        gap: var(--space-md);
-        text-align: center;
-    }
-    
-    .partner-logos {
-        justify-content: center;
-    }
-    
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    padding: var(--space-lg);
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-panel {
+    background: var(--white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    max-width: 800px;
+    max-height: 90vh;
+    width: 100%;
+    overflow: hidden;
+    transform: translateY(50px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-panel {
+    transform: translateY(0);
+}
+
+.modal-header {
+    background: var(--godrej-primary);
+    color: var(--white);
+    padding: var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-content {
+    padding: var(--space-xl);
+    overflow-y: auto;
+    max-height: calc(90vh - 80px);
+}
+
+.policy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-lg);
+}
+
+.policy-section {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    border-left: 4px solid var(--godrej-primary);
+}
+
+.policy-section h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--godrej-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.policy-section p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--gray-700);
+}
+
+/* Mobile Modal Responsiveness */
+/* Replace the existing mobile responsive section with this enhanced version */
+@media (max-width: 1024px) {
     .main-content {
-        padding: var(--space-md);
+        flex-direction: column;
+        gap: var(--space-lg);
     }
     
     .viewer-section {
-        height: 350px;
+        height: 60vh; /* Use viewport height for better mobile scaling */
+        min-height: 400px;
     }
     
     .control-section {
-        grid-template-columns: 1fr;
+        max-width: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .viewer-section {
+        height: 50vh;
+        min-height: 350px;
     }
     
-    .brand-text h1 {
-        font-size: 20px;
-    }
-    
-    .brand-text p {
-        font-size: 12px;
+    /* Make model viewer touch-friendly */
+    model-viewer {
+        touch-action: manipulation;
     }
 }
 
 @media (max-width: 480px) {
-    .header {
-        padding: var(--space-sm);
-    }
-    
-    .main-content {
-        padding: var(--space-sm);
-    }
-    
     .viewer-section {
-        height: 300px;
+        height: 45vh;
+        min-height: 300px;
     }
     
-    .control-panel {
-        padding: var(--space-md);
-    }
-    
-    .notification {
-        top: var(--space-md);
-        right: var(--space-md);
-        left: var(--space-md);
-        max-width: none;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        gap: var(--space-sm);
-        text-align: center;
+    .viewer-container {
+        border-radius: var(--radius-lg); /* Smaller radius on mobile */
     }
 }
 
-/* Landscape Mobile */
+/* Landscape Mobile - Important for mobile 3D viewing */
 @media (max-height: 600px) and (orientation: landscape) {
     .main-content {
         flex-direction: row;
     }
     
     .viewer-section {
-        height: auto;
+        height: 80vh;
+        min-height: auto;
     }
     
     .control-section {

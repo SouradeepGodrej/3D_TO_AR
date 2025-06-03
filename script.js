@@ -698,6 +698,46 @@ function cleanup() {
     models.clear();
 }
 
+// Modal functions
+function openModal(type) {
+    const overlay = document.getElementById('modalOverlay');
+    const privacyModal = document.getElementById('privacyModal');
+    const termsModal = document.getElementById('termsModal');
+    
+    // Hide all modals first
+    privacyModal.style.display = 'none';
+    termsModal.style.display = 'none';
+    
+    // Show the requested modal
+    if (type === 'privacy') {
+        privacyModal.style.display = 'block';
+    } else if (type === 'terms') {
+        termsModal.style.display = 'block';
+    }
+    
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+function closeModal() {
+    const overlay = document.getElementById('modalOverlay');
+    overlay.classList.remove('show');
+    document.body.style.overflow = 'auto'; // Restore scrolling
+}
+
+// Close modal when clicking outside
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+
 // Gallery Management Functions
 function updateGallery() {
     const galleryGrid = document.getElementById('galleryGrid');
