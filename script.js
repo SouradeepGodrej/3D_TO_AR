@@ -78,7 +78,11 @@ async function handleFileUpload(event) {
         
         if (result.secure_url) {
             // Generate unique model ID
-            const modelId = generateModelId();
+            // const modelId = generateModelId();
+
+            const cloudinaryTimestamp = result.public_id.split('/')[1].split('_')[0]; // Extract timestamp from public_id
+    const originalFilename = result.public_id.split('/')[1].split('_').slice(1).join('_'); // Extract filename
+    const modelId = `model_${cloudinaryTimestamp}_${originalFilename}`;
             
             /// Store model data with Cloudinary URL
 const modelData = {
@@ -516,15 +520,17 @@ async function checkUrlParameters() {
         // Method 1: Try to construct Cloudinary URL from modelId if it contains timestamp
 
 if (modelId.includes('model_')) {
-    const timestamp = modelId.split('_')[1];
+    const parts = modelId.split('_');
+    const timestamp = parts[1];
+    const filename = parts.slice(2).join('_'); // Get everything after the second underscore
+    
     if (timestamp && !isNaN(timestamp)) {
         const baseUrl = `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload`;
         
-        // Try different URL patterns based on how Cloudinary actually stores files
+        // Construct URLs using the actual pattern
         const urlVariations = [
-            `${baseUrl}/3d_models/${timestamp}_model`,
-            `${baseUrl}/v${timestamp}/3d_models/${timestamp}_model`,
-            `${baseUrl}/3d_models/${timestamp}_spongebob`,
+            `${baseUrl}/3d_models/${timestamp}_${filename}`,
+            `${baseUrl}/v${timestamp}/3d_models/${timestamp}_${filename}`,
         ];
 
         for (const baseTestUrl of urlVariations) {
