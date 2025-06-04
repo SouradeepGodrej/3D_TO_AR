@@ -402,29 +402,16 @@ async function handleFileUploadImproved(event) {
 }
 
 // Copy to Clipboard Function
-function copyToClipboard() {
-  const shareUrl = document.getElementById("shareUrl");
-  shareUrl.focus();
-
-  if (!shareUrl.value) {
-    showNotification("No URL to copy. Please upload a model first.", "error");
-    return;
-  }
-
-  // Modern clipboard API
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard
-      .writeText(shareUrl.value)
-      .then(() => {
-        showNotification("Link copied to clipboard!");
-      })
-      .catch((err) => {
-        fallbackCopyTextToClipboard(shareUrl.value);
-      });
-  } else {
-    fallbackCopyTextToClipboard(shareUrl.value);
-  }
-}
+    function copyToClipboard() {
+      const shareUrl = document.getElementById('shareUrl');
+      if (shareUrl.value) {
+        navigator.clipboard.writeText(shareUrl.value).then(() => {
+          showNotification('Link copied to clipboard!', 'success');
+        }).catch(() => {
+          showNotification('Failed to copy link', 'error');
+        });
+      }
+    }
 
 // Fallback copy method
 function fallbackCopyTextToClipboard(text) {
@@ -797,6 +784,21 @@ function closeModal() {
   overlay.classList.remove("show");
   document.body.style.overflow = "auto"; // Restore scrolling
 }
+
+    function toggleModelInfo() {
+      const modelInfo = document.getElementById('modelInfo');
+      const toggleBtn = document.getElementById('infoToggleBtn');
+      
+      if (modelInfo.classList.contains('show')) {
+        modelInfo.classList.remove('show');
+        toggleBtn.classList.remove('active');
+        toggleBtn.title = 'Show Model Controls';
+      } else {
+        modelInfo.classList.add('show');
+        toggleBtn.classList.add('active');
+        toggleBtn.title = 'Hide Model Controls';
+      }
+    }
 
 // Close modal when clicking outside
 document.getElementById("modalOverlay").addEventListener("click", function (e) {
