@@ -61,6 +61,7 @@
               auto-rotate
               ar
               ar-modes="webxr scene-viewer quick-look"
+              ar-placement="floor"
               environment-image="neutral"
               exposure="1"
               shadow-intensity="1"
@@ -161,6 +162,34 @@
             </div>
 
             <div class="ar-section">
+<!-- In the AR Panel section, replace the ar-options div -->
+<div class="ar-options">
+  <div class="detection-toggle">
+    <h4 class="toggle-title">Placement Mode</h4>
+    <div class="toggle-buttons">
+      <button 
+        class="toggle-btn active" 
+        id="floorDetection" 
+        onclick="setDetectionMode('floor')"
+      >
+        <span class="btn-icon">🏠</span>
+        <span class="btn-text">Floor Detection</span>
+      </button>
+      <button 
+        class="toggle-btn" 
+        id="wallDetection" 
+        onclick="setDetectionMode('wall')"
+      >
+        <span class="btn-icon">🧱</span>
+        <span class="btn-text">Wall Detection</span>
+      </button>
+    </div>
+    <p class="toggle-description" id="toggleDescription">
+      Place model on floor surfaces (default)
+    </p>
+  </div>
+</div>
+
               <button
                 class="ar-btn primary-btn disabled"
                 id="arBtn"

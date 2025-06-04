@@ -1,6 +1,7 @@
 // Global Variables
 let currentModelUrl = null;
 let models = new Map(); // Store uploaded models
+let currentDetectionMode = 'floor'; // Default mode
 
 const CLOUDINARY_CLOUD_NAME = "dmxbzd7xc"; // Replace with your Cloudinary cloud name
 const CLOUDINARY_UPLOAD_PRESET = "3D_TO_AR"; // Replace with your upload preset name
@@ -441,6 +442,38 @@ function fallbackCopyTextToClipboard(text) {
   }
 }
 
+//Chopose wall or Floor Detection needed
+function setDetectionMode(mode) {
+  const floorBtn = document.getElementById('floorDetection');
+  const wallBtn = document.getElementById('wallDetection');
+  const description = document.getElementById('toggleDescription');
+  
+  // Remove active class from both buttons
+  floorBtn.classList.remove('active');
+  wallBtn.classList.remove('active');
+  
+  // Set current mode and update UI
+  currentDetectionMode = mode;
+  
+  if (mode === 'floor') {
+    floorBtn.classList.add('active');
+    description.textContent = 'Place model on floor surfaces (default)';
+  } else {
+    wallBtn.classList.add('active');
+    description.textContent = 'Place model on wall surfaces';
+  }
+  
+  // Update model-viewer attribute if model is loaded
+  const modelViewer = document.getElementById("modelViewer");
+  if (modelViewer && currentModelUrl) {
+    modelViewer.setAttribute('ar-placement', mode);
+  }
+  
+  // Show notification
+  const modeText = mode === 'floor' ? 'Floor Detection' : 'Wall Detection';
+  showNotification(`${modeText} mode activated`);
+}
+
 // AR Functionality
 function openAR() {
   const modelViewer = document.getElementById("modelViewer");
@@ -450,23 +483,25 @@ function openAR() {
     return;
   }
 
+  // Set detection mode
+  modelViewer.setAttribute('ar-placement', currentDetectionMode);
+
   if (modelViewer.canActivateAR) {
     try {
       modelViewer.activateAR();
-      showNotification("Launching AR experience...");
+      const message = currentDetectionMode === 'wall' ? 
+        "Launching AR with wall detection..." : 
+        "Launching AR with floor detection...";
+      showNotification(message);
     } catch (error) {
       console.error("AR activation error:", error);
       showNotification("Failed to launch AR. Please try again.", "error");
     }
   } else {
     showNotification("AR not supported on this device/browser", "error");
-    console.log("AR Support Info:", {
-      hasWebXR: "xr" in navigator,
-      isSecureContext: window.isSecureContext,
-      userAgent: navigator.userAgent,
-    });
   }
 }
+
 
 // UI State Management
 function showLoading(show) {
