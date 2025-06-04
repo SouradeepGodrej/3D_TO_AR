@@ -453,17 +453,17 @@ function openAR() {
 
   // Set wall detection mode
   if (wallDetection) {
-    modelViewer.setAttribute('ar-placement', 'wall');
+    modelViewer.setAttribute("ar-placement", "wall");
   } else {
-    modelViewer.setAttribute('ar-placement', 'floor');
+    modelViewer.setAttribute("ar-placement", "floor");
   }
 
   if (modelViewer.canActivateAR) {
     try {
       modelViewer.activateAR();
-      const message = wallDetection ? 
-        "Launching AR with wall detection..." : 
-        "Launching AR experience...";
+      const message = wallDetection
+        ? "Launching AR with wall detection..."
+        : "Launching AR experience...";
       showNotification(message);
     } catch (error) {
       console.error("AR activation error:", error);
@@ -998,14 +998,7 @@ window.addEventListener("error", function (event) {
 
 // Service Worker Registration (Optional - for PWA capabilities)
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    // Uncomment if you want to add PWA capabilities
-    // navigator.serviceWorker.register('/sw.js').then(function(registration) {
-    //     console.log('ServiceWorker registration successful');
-    // }).catch(function(err) {
-    //     console.log('ServiceWorker registration failed');
-    // });
-  });
+  window.addEventListener("load", function () {});
 }
 
 // Performance Monitoring (Optional)
