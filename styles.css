@@ -1,13 +1,19 @@
 /* Godrej Properties Brand Colors & Variables */
 :root {
     /* Godrej Brand Colors */
-    --godrej-primary: #2E8B57;           /* Primary green */
-    --godrej-primary-light: #3CB371;     /* Light green */
-    --godrej-primary-dark: #228B22;      /* Dark green */
-    --godrej-secondary: #1E40AF;         /* Primary blue */
-    --godrej-secondary-light: #3B82F6;   /* Light blue */
-    --godrej-accent: #059669;            /* Accent green */
-    
+    --godrej-primary: #2E8B57;
+    /* Primary green */
+    --godrej-primary-light: #3CB371;
+    /* Light green */
+    --godrej-primary-dark: #228B22;
+    /* Dark green */
+    --godrej-secondary: #1E40AF;
+    /* Primary blue */
+    --godrej-secondary-light: #3B82F6;
+    /* Light blue */
+    --godrej-accent: #059669;
+    /* Accent green */
+
     /* Neutral Colors */
     --white: #FFFFFF;
     --gray-50: #F9FAFB;
@@ -20,26 +26,26 @@
     --gray-700: #374151;
     --gray-800: #1F2937;
     --gray-900: #111827;
-    
+
     /* Functional Colors */
     --success: #10B981;
     --warning: #F59E0B;
     --error: #EF4444;
     --info: #3B82F6;
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    
+
     /* Border Radius */
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
-    
+
     /* Spacing */
     --space-xs: 0.5rem;
     --space-sm: 0.75rem;
@@ -214,8 +220,13 @@ model-viewer {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Model Info Overlay */
@@ -658,7 +669,8 @@ model-viewer {
 
 .gallery-item-preview {
     width: 100%;
-    height: 120px; /* Increase height for better visibility */
+    height: 120px;
+    /* Increase height for better visibility */
     background: var(--gray-100);
     border-radius: var(--radius-sm);
     margin-bottom: var(--space-xs);
@@ -684,11 +696,11 @@ model-viewer {
         flex-direction: column;
         gap: var(--space-lg);
     }
-    
+
     .viewer-section {
         height: 400px;
     }
-    
+
     .control-section {
         max-width: none;
         display: grid;
@@ -811,12 +823,13 @@ model-viewer {
         flex-direction: column;
         gap: var(--space-lg);
     }
-    
+
     .viewer-section {
-        height: 60vh; /* Use viewport height for better mobile scaling */
+        height: 60vh;
+        /* Use viewport height for better mobile scaling */
         min-height: 400px;
     }
-    
+
     .control-section {
         max-width: none;
         display: grid;
@@ -830,7 +843,7 @@ model-viewer {
         height: 50vh;
         min-height: 350px;
     }
-    
+
     /* Make model viewer touch-friendly */
     model-viewer {
         touch-action: manipulation;
@@ -842,9 +855,10 @@ model-viewer {
         height: 45vh;
         min-height: 300px;
     }
-    
+
     .viewer-container {
-        border-radius: var(--radius-lg); /* Smaller radius on mobile */
+        border-radius: var(--radius-lg);
+        /* Smaller radius on mobile */
     }
 }
 
@@ -853,12 +867,12 @@ model-viewer {
     .main-content {
         flex-direction: row;
     }
-    
+
     .viewer-section {
         height: 80vh;
         min-height: auto;
     }
-    
+
     .control-section {
         max-width: 350px;
         display: flex;
@@ -868,7 +882,9 @@ model-viewer {
 }
 
 /* High DPI Displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
     .main-logo,
     .tech-logo,
     .studio-logo {
@@ -890,7 +906,7 @@ model-viewer {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     .loader {
         animation: none;
     }
@@ -909,18 +925,18 @@ model-viewer {
     .container {
         background: var(--white);
     }
-    
+
     .header,
     .footer {
         background: var(--white);
         box-shadow: none;
     }
-    
+
     .notification,
     .loading-overlay {
         display: none;
     }
-    
+
     .control-panel {
         box-shadow: none;
         border: 1px solid var(--gray-400);
