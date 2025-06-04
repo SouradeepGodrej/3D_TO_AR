@@ -14,6 +14,70 @@
 
   <!-- Google Fonts for professional typography -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Info Toggle Button Styles */
+    .info-toggle-btn {
+      position: absolute;
+      bottom: var(--space-lg);
+      right: var(--space-lg);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid var(--godrej-primary);
+      color: var(--godrej-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      z-index: 5;
+    }
+
+    .info-toggle-btn:hover {
+      background: var(--godrej-primary);
+      color: var(--white);
+      transform: scale(1.1);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .info-toggle-btn:active {
+      transform: scale(0.95);
+    }
+
+    .info-toggle-btn.active {
+      background: var(--godrej-primary);
+      color: var(--white);
+    }
+
+    /* Update model-info to be hidden by default */
+    .model-info {
+      position: absolute;
+      bottom: var(--space-lg);
+      left: var(--space-lg);
+      right: var(--space-lg);
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .model-info.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 
 <body>
@@ -37,13 +101,18 @@
     <!-- Main Content Area -->
     <div class="main-content">
 
-      <!-- Model Viewere Section -->
+      <!-- Model Viewer Section -->
       <div class="viewer-section">
         <div class="viewer-container">
           <div class="loading-overlay" id="loadingOverlay">
             <div class="loader"></div>
             <p class="loader-text">Loading your 3D model...</p>
           </div>
+
+          <!-- Info Toggle Button -->
+          <button class="info-toggle-btn" id="infoToggleBtn" onclick="toggleModelInfo()" title="Toggle Model Controls">
+            ℹ️
+          </button>
 
           <model-viewer id="modelViewer" camera-controls touch-action="pan-y" auto-rotate ar
             ar-modes="webxr scene-viewer quick-look" environment-image="neutral" exposure="1" shadow-intensity="1"
@@ -177,7 +246,112 @@
   </footer>
 
   <!-- Local JavaScript -->
-  <script src="script.js"></script>
+  <script>
+    // Toggle model info panel
+    function toggleModelInfo() {
+      const modelInfo = document.getElementById('modelInfo');
+      const toggleBtn = document.getElementById('infoToggleBtn');
+      
+      if (modelInfo.classList.contains('show')) {
+        modelInfo.classList.remove('show');
+        toggleBtn.classList.remove('active');
+        toggleBtn.title = 'Show Model Controls';
+      } else {
+        modelInfo.classList.add('show');
+        toggleBtn.classList.add('active');
+        toggleBtn.title = 'Hide Model Controls';
+      }
+    }
+
+    // Copy to clipboard function
+    function copyToClipboard() {
+      const shareUrl = document.getElementById('shareUrl');
+      if (shareUrl.value) {
+        navigator.clipboard.writeText(shareUrl.value).then(() => {
+          showNotification('Link copied to clipboard!', 'success');
+        }).catch(() => {
+          showNotification('Failed to copy link', 'error');
+        });
+      }
+    }
+
+    // Open AR function
+    function openAR() {
+      const modelViewer = document.getElementById('modelViewer');
+      if (modelViewer && !document.getElementById('arBtn').classList.contains('disabled')) {
+        modelViewer.activateAR();
+      }
+    }
+
+    // Show notification function
+    function showNotification(message, type = 'success') {
+      const notification = document.getElementById('notification');
+      const notificationText = notification.querySelector('.notification-text');
+      const notificationIcon = notification.querySelector('.notification-icon');
+      
+      // Set message
+      notificationText.textContent = message;
+      
+      // Set icon based on type
+      switch(type) {
+        case 'success':
+          notificationIcon.textContent = '✅';
+          break;
+        case 'error':
+          notificationIcon.textContent = '❌';
+          break;
+        case 'warning':
+          notificationIcon.textContent = '⚠️';
+          break;
+        case 'info':
+          notificationIcon.textContent = 'ℹ️';
+          break;
+      }
+      
+      // Remove existing type classes and add new one
+      notification.className = `notification ${type}`;
+      
+      // Show notification
+      notification.classList.add('show');
+      
+      // Hide after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    // Modal functions
+    function openModal(type) {
+      const modalOverlay = document.getElementById('modalOverlay');
+      const privacyModal = document.getElementById('privacyModal');
+      const termsModal = document.getElementById('termsModal');
+      
+      // Hide all modals first
+      privacyModal.style.display = 'none';
+      termsModal.style.display = 'none';
+      
+      // Show the requested modal
+      if (type === 'privacy') {
+        privacyModal.style.display = 'block';
+      } else if (type === 'terms') {
+        termsModal.style.display = 'block';
+      }
+      
+      modalOverlay.classList.add('show');
+    }
+
+    function closeModal() {
+      const modalOverlay = document.getElementById('modalOverlay');
+      modalOverlay.classList.remove('show');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+  </script>
 
   <!-- Modal Overlay -->
   <div class="modal-overlay" id="modalOverlay">
