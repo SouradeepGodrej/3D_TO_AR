@@ -2,6 +2,10 @@
 let currentModelUrl = null;
 let models = new Map(); // Store uploaded models
 let currentDetectionMode = 'floor'; // Default mode
+const AR_MODES = {
+  floor: 'scene-viewer quick-look',
+  wall: 'scene-viewer quick-look' 
+};
 
 const CLOUDINARY_CLOUD_NAME = "dmxbzd7xc"; // Replace with your Cloudinary cloud name
 const CLOUDINARY_UPLOAD_PRESET = "3D_TO_AR"; // Replace with your upload preset name
@@ -20,6 +24,8 @@ function initializeApp() {
   setupARSupport();
   preventDoubleTapZoom();
   updateGallery();
+
+  setDetectionMode('floor');
 }
 
 // Event Listeners Setup
@@ -175,12 +181,42 @@ function loadModel(url, filename, modelId) {
   modelViewer.dataset.modelId = modelId;
   modelViewer.dataset.filename = filename;
 
+  // Set AR attributes based on current detection mode
+  updateModelViewerForAR();
+
   // Force texture reload and proper lighting
   setTimeout(() => {
     modelViewer.dismissPoster();
     modelViewer.jumpCameraToGoal();
   }, 100);
 }
+function initializeModelViewerAR() {
+  const modelViewer = document.getElementById("modelViewer");
+  
+  // Add AR-specific event listeners
+  modelViewer.addEventListener('ar-status', (event) => {
+    if (event.detail.status === 'session-started') {
+      console.log('AR session started');
+      const modeText = currentDetectionMode === 'wall' ? 'wall' : 'floor';
+      console.log(`AR mode: ${modeText} detection`);
+    } else if (event.detail.status === 'object-placed') {
+      console.log('Object placed in AR');
+    } else if (event.detail.status === 'failed') {
+      console.error('AR failed:', event.detail.error);
+      showNotification("AR session failed. Please try again.", "error");
+    }
+  });
+
+  // Handle AR tracking state
+  modelViewer.addEventListener('tracking-changed', (event) => {
+    if (event.detail.tracking === 'tracking') {
+      console.log('AR tracking active');
+    } else {
+      console.log('AR tracking lost');
+    }
+  });
+}
+
 
 // Model Load Success Handler
 function onModelLoad(event) {
@@ -448,6 +484,11 @@ function setDetectionMode(mode) {
   const wallBtn = document.getElementById('wallDetection');
   const description = document.getElementById('toggleDescription');
   
+  if (!floorBtn || !wallBtn || !description) {
+    console.error('Detection mode buttons not found in DOM');
+    return;
+  }
+  
   // Remove active class from both buttons
   floorBtn.classList.remove('active');
   wallBtn.classList.remove('active');
@@ -463,15 +504,33 @@ function setDetectionMode(mode) {
     description.textContent = 'Place model on wall surfaces';
   }
   
-  // Update model-viewer attribute if model is loaded
-  const modelViewer = document.getElementById("modelViewer");
-  if (modelViewer && currentModelUrl) {
-    modelViewer.setAttribute('ar-placement', mode);
-  }
+  // Update model-viewer attributes if model is loaded
+  updateModelViewerForAR();
   
   // Show notification
   const modeText = mode === 'floor' ? 'Floor Detection' : 'Wall Detection';
   showNotification(`${modeText} mode activated`);
+}
+function updateModelViewerForAR() {
+  const modelViewer = document.getElementById("modelViewer");
+  if (!modelViewer || !currentModelUrl) {
+    return;
+  }
+
+  // Set AR modes based on detection mode
+  modelViewer.setAttribute('ar-modes', AR_MODES[currentDetectionMode]);
+  
+  // For wall detection, we need to adjust the model placement
+  if (currentDetectionMode === 'wall') {
+    // Set camera orbit for better wall viewing
+    modelViewer.setAttribute('camera-orbit', '0deg 90deg 2m');
+    // Disable auto-rotate for wall mode (it can be disorienting)
+    modelViewer.removeAttribute('auto-rotate');
+  } else {
+    // Floor mode settings
+    modelViewer.setAttribute('camera-orbit', '45deg 55deg 4m');
+    modelViewer.setAttribute('auto-rotate', '');
+  }
 }
 
 // AR Functionality
@@ -483,22 +542,29 @@ function openAR() {
     return;
   }
 
-  // Set detection mode
-  modelViewer.setAttribute('ar-placement', currentDetectionMode);
+  // Update model viewer before launching AR
+  updateModelViewerForAR();
 
-  if (modelViewer.canActivateAR) {
-    try {
-      modelViewer.activateAR();
-      const message = currentDetectionMode === 'wall' ? 
-        "Launching AR with wall detection..." : 
-        "Launching AR with floor detection...";
-      showNotification(message);
-    } catch (error) {
-      console.error("AR activation error:", error);
-      showNotification("Failed to launch AR. Please try again.", "error");
-    }
-  } else {
+  // Check AR capability
+  if (!modelViewer.canActivateAR) {
     showNotification("AR not supported on this device/browser", "error");
+    return;
+  }
+
+  try {
+    // For wall detection, provide user guidance
+    if (currentDetectionMode === 'wall') {
+      showNotification("Point your camera at a wall surface. Tap to place the model when the wall is detected.", "info");
+    } else {
+      showNotification("Point your camera at the floor. Tap to place the model when the surface is detected.", "info");
+    }
+
+    // Activate AR
+    modelViewer.activateAR();
+    
+  } catch (error) {
+    console.error("AR activation error:", error);
+    showNotification("Failed to launch AR. Please try again.", "error");
   }
 }
 
@@ -705,23 +771,40 @@ async function testModelUrl(url) {
 
 // AR Support Detection
 function setupARSupport() {
+  const modelViewer = document.getElementById("modelViewer");
+  
+  // Initialize AR event listeners
+  initializeModelViewerAR();
+  
+  // Check device capabilities
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  
+  if (isAndroid) {
+    console.log("Android device detected - Scene Viewer available");
+    // Android Scene Viewer has limited wall detection
+    // It primarily uses floor detection
+  } else if (isIOS) {
+    console.log("iOS device detected - Quick Look available");
+    // iOS Quick Look supports both floor and wall placement
+    // Wall detection works better on newer iOS devices
+  } else {
+    console.log("Desktop device - AR might have limited support");
+  }
+
+  // Test AR capability
   if ("xr" in navigator) {
-    navigator.xr
-      .isSessionSupported("immersive-ar")
+    navigator.xr.isSessionSupported("immersive-ar")
       .then((supported) => {
         if (supported) {
           console.log("WebXR AR is supported");
         } else {
-          console.log("WebXR AR not supported, checking for other AR methods");
-          checkAlternativeARSupport();
+          console.log("WebXR AR not supported, using fallback AR methods");
         }
       })
       .catch((error) => {
         console.log("WebXR not available:", error);
-        checkAlternativeARSupport();
       });
-  } else {
-    checkAlternativeARSupport();
   }
 }
 
