@@ -795,13 +795,15 @@ function toggleModelInfo() {
   if (modelInfo.classList.contains("hidden")) {
     // Show the info panel
     modelInfo.classList.remove("hidden");
-    toggleBtn.innerHTML = '<span class="toggle-icon">❌</span>';
-    toggleBtn.style.background = "linear-gradient(135deg, #dc3545, #c82333)";
+    toggleBtn.classList.add("active");
+    // Removed: toggleBtn.innerHTML line
+    // Removed: toggleBtn.style.background line
   } else {
     // Hide the info panel
     modelInfo.classList.add("hidden");
-    toggleBtn.innerHTML = '<span class="toggle-icon">ℹ️</span>';
-    toggleBtn.style.background = "linear-gradient(135deg, #007bff, #0056b3)";
+    toggleBtn.classList.remove("active");
+    // Removed: toggleBtn.innerHTML line
+    // Removed: toggleBtn.style.background line
   }
 }
 
