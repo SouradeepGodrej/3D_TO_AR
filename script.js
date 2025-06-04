@@ -402,16 +402,19 @@ async function handleFileUploadImproved(event) {
 }
 
 // Copy to Clipboard Function
-    function copyToClipboard() {
-      const shareUrl = document.getElementById('shareUrl');
-      if (shareUrl.value) {
-        navigator.clipboard.writeText(shareUrl.value).then(() => {
-          showNotification('Link copied to clipboard!', 'success');
-        }).catch(() => {
-          showNotification('Failed to copy link', 'error');
-        });
-      }
-    }
+function copyToClipboard() {
+  const shareUrl = document.getElementById("shareUrl");
+  if (shareUrl.value) {
+    navigator.clipboard
+      .writeText(shareUrl.value)
+      .then(() => {
+        showNotification("Link copied to clipboard!", "success");
+      })
+      .catch(() => {
+        showNotification("Failed to copy link", "error");
+      });
+  }
+}
 
 // Fallback copy method
 function fallbackCopyTextToClipboard(text) {
@@ -785,20 +788,28 @@ function closeModal() {
   document.body.style.overflow = "auto"; // Restore scrolling
 }
 
-    function toggleModelInfo() {
-      const modelInfo = document.getElementById('modelInfo');
-      const toggleBtn = document.getElementById('infoToggleBtn');
-      
-      if (modelInfo.classList.contains('show')) {
-        modelInfo.classList.remove('show');
-        toggleBtn.classList.remove('active');
-        toggleBtn.title = 'Show Model Controls';
-      } else {
-        modelInfo.classList.add('show');
-        toggleBtn.classList.add('active');
-        toggleBtn.title = 'Hide Model Controls';
-      }
-    }
+function toggleModelInfo() {
+  const modelInfo = document.getElementById("modelInfo");
+  const toggleBtn = document.getElementById("infoToggleBtn");
+
+  if (modelInfo.classList.contains("hidden")) {
+    // Show the info panel
+    modelInfo.classList.remove("hidden");
+    toggleBtn.innerHTML = '<span class="toggle-icon">❌</span>';
+    toggleBtn.style.background = "linear-gradient(135deg, #dc3545, #c82333)";
+  } else {
+    // Hide the info panel
+    modelInfo.classList.add("hidden");
+    toggleBtn.innerHTML = '<span class="toggle-icon">ℹ️</span>';
+    toggleBtn.style.background = "linear-gradient(135deg, #007bff, #0056b3)";
+  }
+}
+
+// Initialize the model info as hidden when page loads
+document.addEventListener("DOMContentLoaded", function () {
+  const modelInfo = document.getElementById("modelInfo");
+  modelInfo.classList.add("hidden");
+});
 
 // Close modal when clicking outside
 document.getElementById("modalOverlay").addEventListener("click", function (e) {
