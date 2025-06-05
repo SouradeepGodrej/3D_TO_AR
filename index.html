@@ -17,6 +17,35 @@
 </head>
 
 <body>
+    <!-- User Guide Panel -->
+    <div class="guide-overlay" id="guideOverlay">
+        <div class="guide-panel">
+            <div class="guide-header">
+                <h2>🎯 Welcome to 3D AR Model Viewer</h2>
+                <button class="guide-close" id="guideClose">&times;</button>
+            </div>
+            <div class="guide-content">
+                <div class="guide-scroll">
+                    <!-- Your guide content here -->
+                    <h3>📋 How to Use:</h3>
+                    <p>1. Upload your 3D model (.GLB or .GLTF format)</p>
+                    <p>2. View and interact with your model</p>
+                    <p>3. Generate QR code to share</p>
+                    <p>4. Launch AR experience on mobile devices</p>
+                    <!-- Add more guide content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator (shows after guide panel) -->
+    <div class="page-scroll-indicator" id="pageScrollIndicator">
+        <div class="scroll-arrow">
+            <span>↓</span>
+        </div>
+        <p class="scroll-text">Scroll to explore</p>
+    </div>
+
     <div class="container">
         <!-- Header with Logos -->
         <header class="header">

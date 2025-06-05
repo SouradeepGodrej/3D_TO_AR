@@ -11,6 +11,35 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeApp();
 });
 
+// Guide Panel UI
+function showGuidePanel() {
+    const guideOverlay = document.getElementById('guideOverlay');
+    guideOverlay.classList.add('show');
+    
+    // Auto-hide after 30 seconds
+    setTimeout(() => {
+        hideGuidePanel();
+    }, 30000);
+}
+function hideGuidePanel() {
+  const guideOverlay = document.getElementById("guideOverlay");
+  const pageScrollIndicator = document.getElementById("pageScrollIndicator");
+  guideOverlay.classList.remove("show");
+
+  // Show page scroll indicator after guide panel hides
+  setTimeout(() => {
+    if (pageScrollIndicator) {
+      pageScrollIndicator.classList.add("show");
+    }
+  }, 500); // Small delay for smooth transition
+
+  setTimeout(() => {
+    if (pageScrollIndicator) {
+      pageScrollIndicator.classList.remove("show");
+    }
+  }, 10000);
+}
+
 // Application Initialization
 function initializeApp() {
   setupEventListeners();
@@ -19,6 +48,7 @@ function initializeApp() {
   setupARSupport();
   preventDoubleTapZoom();
   updateGallery();
+  showGuidePanel();
 }
 
 // Event Listeners Setup
@@ -36,6 +66,41 @@ function setupEventListeners() {
   const modelViewer = document.getElementById("modelViewer");
   modelViewer.addEventListener("load", onModelLoad);
   modelViewer.addEventListener("error", onModelError);
+
+  // Guide panel close button
+  document
+    .getElementById("guideClose")
+    .addEventListener("click", hideGuidePanel);
+
+  // Close when clicking outside panel
+  document
+    .getElementById("guideOverlay")
+    .addEventListener("click", function (e) {
+      if (e.target === this) {
+        hideGuidePanel();
+      }
+    });
+  // Page scroll detection to hide scroll indicator
+  window.addEventListener("scroll", handlePageScroll);
+  const pageScrollIndicator = document.getElementById("pageScrollIndicator");
+  if (pageScrollIndicator) {
+    pageScrollIndicator.addEventListener("click", function () {
+      window.scrollTo({
+        top: window.innerHeight * 0.8,
+        behavior: "smooth",
+      });
+    });
+  }
+}
+function handlePageScroll() {
+    const pageScrollIndicator = document.getElementById('pageScrollIndicator');
+    
+    if (!pageScrollIndicator) return;
+    
+    // Hide indicator when user scrolls down
+    if (window.scrollY > 100) {
+        pageScrollIndicator.classList.remove('show');
+    }
 }
 
 // File Upload Handler
@@ -306,7 +371,6 @@ function generateQRCode(modelId) {
       '<div class="qr-placeholder">QR Code generation failed</div>';
   }
 }
-
 async function handleFileUploadImproved(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -474,7 +538,6 @@ function showLoading(show) {
     overlay.classList.remove("show");
   }
 }
-
 function showModelInfo(show) {
   const info = document.getElementById("modelInfo");
   if (show) {
@@ -483,7 +546,6 @@ function showModelInfo(show) {
     info.classList.remove("show");
   }
 }
-
 function enableAR(enable) {
   const arBtn = document.getElementById("arBtn");
   
@@ -699,7 +761,6 @@ function setupARSupport() {
     checkAlternativeARSupport();
   }
 }
-
 function checkAlternativeARSupport() {
   const isAndroid = /Android/i.test(navigator.userAgent);
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -736,12 +797,10 @@ function preventDoubleTapZoom() {
     false
   );
 }
-
 function handleViewportChange() {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty("--vh", `${vh}px`);
 }
-
 function handleViewportChanges() {
   handleViewportChange();
 
@@ -761,7 +820,6 @@ function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
-
 function logModelStats(modelViewer) {
   // Log basic model information
   console.log("Model loaded successfully:", {
@@ -809,7 +867,6 @@ function closeModal() {
   overlay.classList.remove("show");
   document.body.style.overflow = "auto"; // Restore scrolling
 }
-
 function toggleModelInfo() {
   const modelInfo = document.getElementById("modelInfo");
   const toggleBtn = document.getElementById("infoToggleBtn");
