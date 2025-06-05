@@ -189,7 +189,18 @@ function onModelLoad(event) {
 
   showLoading(false);
   showModelInfo(true);
-  enableAR(true);
+  
+  // Enable AR after model loads and check AR support
+  setTimeout(() => {
+    const arSupported = modelViewer.canActivateAR;
+    console.log("AR Support:", arSupported);
+    enableAR(arSupported);
+    
+    if (!arSupported) {
+      showNotification("AR not available on this device", "warning");
+    }
+  }, 1000); // Give model-viewer time to initialize AR capabilities
+  
   generateQRCode(modelId);
   updateUrlHistory(modelId);
   showNotification(`${filename} loaded successfully!`);
@@ -198,12 +209,9 @@ function onModelLoad(event) {
   setTimeout(() => {
     modelViewer.dismissPoster();
     modelViewer.jumpCameraToGoal();
-
-    // Check if textures are loaded
     checkTextureStatus(modelViewer);
   }, 500);
 
-  // Log model statistics
   logModelStats(modelViewer);
   updateGallery();
 }
@@ -434,33 +442,26 @@ function fallbackCopyTextToClipboard(text) {
 // AR Functionality
 function openAR() {
   const modelViewer = document.getElementById("modelViewer");
-  const wallDetection = document.getElementById("wallDetection").checked;
-
-  if (!modelViewer || !currentModelUrl) {
+  
+  // Check if model is loaded
+  if (!modelViewer || !modelViewer.src || !currentModelUrl) {
     showNotification("Please upload a model first", "error");
     return;
   }
 
-  // Set wall detection mode
-  if (wallDetection) {
-    modelViewer.setAttribute("ar-placement", "wall");
-  } else {
-    modelViewer.setAttribute("ar-placement", "floor");
+  // Check if AR is supported
+  if (!modelViewer.canActivateAR) {
+    showNotification("AR not supported on this device/browser", "error");
+    return;
   }
 
-  if (modelViewer.canActivateAR) {
-    try {
-      modelViewer.activateAR();
-      const message = wallDetection
-        ? "Launching AR with wall detection..."
-        : "Launching AR experience...";
-      showNotification(message);
-    } catch (error) {
-      console.error("AR activation error:", error);
-      showNotification("Failed to launch AR. Please try again.", "error");
-    }
-  } else {
-    showNotification("AR not supported on this device/browser", "error");
+  try {
+    // Activate AR
+    modelViewer.activateAR();
+    showNotification("Launching AR experience...");
+  } catch (error) {
+    console.error("AR activation error:", error);
+    showNotification("Failed to launch AR. Please try again.", "error");
   }
 }
 
@@ -485,10 +486,15 @@ function showModelInfo(show) {
 
 function enableAR(enable) {
   const arBtn = document.getElementById("arBtn");
+  
   if (enable) {
+    arBtn.classList.remove("disabled");
     arBtn.classList.add("active");
+    arBtn.disabled = false; // Enable the button
   } else {
+    arBtn.classList.add("disabled");
     arBtn.classList.remove("active");
+    arBtn.disabled = true; // Disable the button
   }
 }
 
@@ -666,19 +672,27 @@ async function testModelUrl(url) {
 
 // AR Support Detection
 function setupARSupport() {
-  if ("xr" in navigator) {
-    navigator.xr
-      .isSessionSupported("immersive-ar")
+  const modelViewer = document.getElementById("modelViewer");
+  
+  // Listen for AR support changes
+  modelViewer.addEventListener('ar-status', (event) => {
+    console.log('AR Status:', event.detail.status);
+    if (event.detail.status === 'not-presenting') {
+      enableAR(false);
+    }
+  });
+
+  // Check for WebXR support
+  if ('xr' in navigator) {
+    navigator.xr.isSessionSupported('immersive-ar')
       .then((supported) => {
-        if (supported) {
-          console.log("WebXR AR is supported");
-        } else {
-          console.log("WebXR AR not supported, checking for other AR methods");
+        console.log('WebXR AR supported:', supported);
+        if (!supported) {
           checkAlternativeARSupport();
         }
       })
       .catch((error) => {
-        console.log("WebXR not available:", error);
+        console.log('WebXR not available:', error);
         checkAlternativeARSupport();
       });
   } else {
@@ -689,6 +703,14 @@ function setupARSupport() {
 function checkAlternativeARSupport() {
   const isAndroid = /Android/i.test(navigator.userAgent);
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+
+  console.log('Device check:', { isAndroid, isIOS, isSecure });
+
+  if (!isSecure) {
+    console.warn('AR requires HTTPS or localhost');
+    showNotification("AR requires a secure connection (HTTPS)", "warning");
+  }
 
   if (isAndroid) {
     console.log("Android device detected - Scene Viewer should be available");
